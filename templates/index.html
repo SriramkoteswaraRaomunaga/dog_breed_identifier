@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dog Breed Identification</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Inter:wght@300;400;600&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --primary-gold: #FFD700;
+            --bg-dark: #0a0a0a;
+            --text-light: #ffffff;
+            --text-dim: #a0a0a0;
+            --accent-green: #10B981;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Navigation */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 5%;
+            position: absolute;
+            top: 0;
+            width: 100%;
+            z-index: 100;
+        }
+
+        .logo {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            font-size: 1.2rem;
+            letter-spacing: 2px;
+            color: var(--text-dim);
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-light);
+            font-size: 0.9rem;
+            font-weight: 400;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary-gold);
+        }
+
+        .nav-links a.active {
+            color: var(--primary-gold);
+        }
+
+        .inspect-btn {
+            border: 1px solid var(--primary-gold);
+            padding: 0.4rem 1.2rem;
+            color: var(--primary-gold);
+            text-decoration: none;
+            font-size: 0.8rem;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+
+        .inspect-btn:hover {
+            background: var(--primary-gold);
+            color: var(--bg-dark);
+        }
+
+        /* Hero Section */
+        .hero {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 0 10%;
+            position: relative;
+            background: radial-gradient(circle at center, #1a1a1a 0%, #0a0a0a 100%);
+        }
+
+        /* Prediction Text */
+        .prediction-result {
+            margin-top: 2rem;
+            animation: fadeIn 1s ease-out;
+        }
+
+        .prediction-header {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .breed-name {
+            font-weight: 700;
+        }
+
+        .dot {
+            color: var(--primary-gold);
+        }
+
+        .confidence {
+            color: var(--text-dim);
+            font-size: 1.1rem;
+            margin-top: 0.5rem;
+        }
+
+        /* Upload Container */
+        .upload-container {
+            margin-top: 3rem;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .image-preview-box {
+            width: 100%;
+            min-height: 300px;
+            background: #151515;
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+            border: 1px solid #222;
+        }
+
+        .image-preview-box img {
+            max-width: 100%;
+            max-height: 500px;
+            object-fit: contain;
+        }
+
+        .placeholder-text {
+            color: var(--text-dim);
+            font-size: 0.9rem;
+        }
+
+        .predict-btn {
+            background-color: var(--accent-green);
+            color: white;
+            padding: 0.8rem 2.5rem;
+            border: none;
+            border-radius: 4px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.3s;
+        }
+
+        .predict-btn:hover {
+            opacity: 0.9;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .choose-file-btn {
+            display: inline-block;
+            margin-top: 1rem;
+            color: var(--text-dim);
+            cursor: pointer;
+            font-size: 0.8rem;
+            text-decoration: underline;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .error {
+            color: #ef4444;
+            margin-top: 1rem;
+        }
+
+        /* Background Graphics (Abstract) */
+        .bg-pattern {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80%;
+            height: 80%;
+            background: url('https://www.transparenttextures.com/patterns/carbon-fibre.png');
+            opacity: 0.05;
+            pointer-events: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav>
+        <div class="logo">DOG BREED IDENTIFICATION</div>
+        <div class="nav-links">
+            <a href="#" class="active">Home</a>
+            <a href="#">About</a>
+            <a href="#">Contact</a>
+            <a href="#" class="inspect-btn">Inspect</a>
+        </div>
+    </nav>
+
+    <div class="hero">
+        <div class="bg-pattern"></div>
+
+        {% if prediction %}
+        <div class="prediction-result">
+            <h1 class="prediction-header">
+                The Dog Breed is <br>
+                <span class="breed-name">{{ prediction }}</span><span class="dot">.</span>
+            </h1>
+            <p class="confidence">Confidence Score: {{ confidence }}%</p>
+        </div>
+        {% endif %}
+
+        {% if error %}
+        <p class="error">{{ error }}</p>
+        {% endif %}
+
+        <div class="upload-container">
+            <form action="/predict" method="post" enctype="multipart/form-data" id="upload-form">
+                <div class="image-preview-box" id="preview-box"
+                    onclick="document.getElementById('file-upload').click()">
+                    {% if image_url %}
+                    <img src="{{ image_url }}" alt="Result Image">
+                    {% else %}
+                    <div class="placeholder-text" id="placeholder">Click or Drag to Upload Dog Image</div>
+                    <img id="preview-img" style="display: none;">
+                    {% endif %}
+                </div>
+
+                <input id="file-upload" type="file" name="file" accept="image/*" onchange="previewFile()">
+
+                <button type="submit" class="predict-btn" id="predict-btn">Predict</button>
+                <br>
+                <label for="file-upload" class="choose-file-btn">Change Image</label>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function previewFile() {
+            const preview = document.getElementById('preview-img');
+            const placeholder = document.getElementById('placeholder');
+            const file = document.getElementById('file-upload').files[0];
+            const reader = new FileReader();
+
+            reader.addEventListener("load", function () {
+                preview.src = reader.result;
+                preview.style.display = 'block';
+                if (placeholder) placeholder.style.display = 'none';
+
+                // If there's an existing result image, hide it to show preview
+                const resultImg = document.querySelector('.image-preview-box img:not(#preview-img)');
+                if (resultImg) resultImg.style.display = 'none';
+            }, false);
+
+            if (file) {
+                reader.readAsDataURL(file);
+            }
+        }
+
+        document.getElementById('upload-form').onsubmit = function () {
+            const btn = document.getElementById('predict-btn');
+            const file = document.getElementById('file-upload').files;
+
+            // Allow submission if we already have a result or a new file
+            const hasExisting = document.querySelector('.image-preview-box img');
+            if (file.length === 0 && (!hasExisting || hasExisting.style.display === 'none')) {
+                alert("Please select an image first.");
+                return false;
+            }
+
+            btn.textContent = "Analyzing...";
+            btn.style.opacity = "0.7";
+        };
+    </script>
+</body>
+
+</html>
